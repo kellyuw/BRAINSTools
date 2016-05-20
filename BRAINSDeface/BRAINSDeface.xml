@@ -4,7 +4,7 @@
   <title>BRAINSDeface</title>
   <description>Deidentify head images without destroying useful facial information</description>
   <contributor>
-    Alexander Leinoff (alexander-elinoff -at- uiowa.edu) </contributor>
+    Alexander Leinoff (alexander-leinoff -at- uiowa.edu) </contributor>
   <acknowledgements>
     <![CDATA[Hans Johnson(1,2,3); Alexander Leinoff(3); Yue Pan(3); Wei Shao(3)  1=University of Iowa Department of Psychiatry, 2=University of Iowa Department of Biomedical Engineering, 3=University of Iowa Department of Electrical and Computer Engineering]]>
   </acknowledgements>
@@ -16,16 +16,16 @@
     <description>Input/output parameters</description>
     <image>
       <label>Input Volume</label>
-      <name>inputVolume</name>
+      <name>inputImage</name>
       <channel>input</channel>
-      <longflag> inputVolume </longflag>
+      <longflag>inputImage</longflag>
       <description>Input Image of a head</description>
       <default>None</default>
     </image>
     <description>Input/output parameters</description>
     <image>
        <label>LabelMap</label>
-       <name>LabelMap</name>
+       <name>labelmap</name>
        <channel>input</channel>
        <longflag>labelmap</longflag>
        <description>A Label Map for the head</description>
