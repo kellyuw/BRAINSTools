@@ -31,6 +31,15 @@
        <description>A Label Map for the head</description>
        <default>None</default>
     </image>
+    <description>Outut volume deformed image name</description>
+    <image>
+      <label>DeformedImage name</label>
+      <name>deformedImageName</name>
+      <channel>output</channel>
+      <longflag>deformedImageName</longflag>
+      <description>A name for the output of the deformed Image</description>
+      <default>None</default>
+    </image>
     <file fileExtensions=".fcsv">
        <label>Landmarks File</label>
        <channel>input</channel>
