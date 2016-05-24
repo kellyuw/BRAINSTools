@@ -40,6 +40,14 @@
       <description>A name for the output of the deformed Image</description>
       <default>None</default>
     </image>
+    <image>
+      <label>OutputMask name</label>
+      <name>outputMask</name>
+      <channel>output</channel>
+      <longflag>outputMask</longflag>
+      <description>A name for the output mask derived from the Atlas Label map</description>
+      <default>None</default>
+    </image>
     <file fileExtensions=".fcsv">
        <label>Landmarks File</label>
        <channel>input</channel>

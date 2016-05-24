@@ -56,7 +56,7 @@ int main(int argc, char **argv)
   MaskAtlasWriterType::Pointer maskAtlasWriter = MaskAtlasWriterType::New();
 
   maskAtlasWriter->SetInput(maskFilter->GetOutput());
-  maskAtlasWriter->SetFileName("/scratch/aleinoff/defaceOutput/binaryBrainMask.nii.gz");
+  maskAtlasWriter->SetFileName(outputMask);
   maskAtlasWriter->Update();
 
 
