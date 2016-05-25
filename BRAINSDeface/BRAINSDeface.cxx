@@ -3,6 +3,7 @@
 //
 
 
+#include <itkTransformToDisplacementFieldFilter.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 #include <BRAINSDefaceCLP.h>
@@ -12,6 +13,19 @@
 #include <stdlib.h>
 #include <time.h>
 #include <itkResampleImageFilter.h>
+#include <itkDanielssonDistanceMapImageFilter.h>
+#include <itkDivideImageFilter.h>
+#include <itkVectorIndexSelectionCastImageFilter.h>
+#include <itkTransformFileWriter.h>
+
+double myRandom()
+{
+  const int min = -5;
+  const int max = 5;
+  const int range = max - min;
+  std::srand(time(nullptr));
+  return static_cast< double >( rand() % range +1 - max );
+}
 
 int main(int argc, char **argv)
 {
@@ -19,7 +33,7 @@ int main(int argc, char **argv)
 
   //Read in the imagefile. Right now assumed to be t1 weighted image
 
-  typedef double PixelType;
+  typedef  double PixelType;
   //TODO: how to activate cpp11 in BRAINSTools so I can use constexpr???
   const unsigned int Dimension = 3;
 
@@ -28,6 +42,9 @@ int main(int argc, char **argv)
   ImageReaderType::Pointer imageReader = ImageReaderType::New();
   imageReader->SetFileName(inputImage);
 
+  //Extract subject image from reader
+  ImageType::Pointer subject = imageReader->GetOutput();
+  imageReader->Update();
   //
 
   //Read in the atlas label file
@@ -59,11 +76,42 @@ int main(int argc, char **argv)
   maskAtlasWriter->SetFileName(outputMask);
   maskAtlasWriter->Update();
 
+  //Get a distance map to the Brain region:
+  //TODO: This should be changed to the other kind of distance map that is faster(Mauer I think it is called???)
+  typedef itk::DanielssonDistanceMapImageFilter<MaskAtlasType, ImageType, ImageType> DistanceMapFilter;
+  DistanceMapFilter::Pointer distanceMapFilter = DistanceMapFilter::New();
+  distanceMapFilter->SetInput(maskFilter->GetOutput());
+  distanceMapFilter->InputIsBinaryOn();
+
+
+  //Write the distance map to a file so we can see what it did:
+  typedef itk::ImageFileWriter<ImageType> DistanceMapWriterType;
+/*  DistanceMapWriterType::Pointer distanceMapWriter = DistanceMapWriterType::New();
+  distanceMapWriter->SetInput(distanceMapFilter->GetOutput());
+  distanceMapWriter->SetFileName(distanceMapFileName);
+  distanceMapWriter->Update();
+*/
+
+/*
+  //scale the distance map to reduce displacement:
+  typedef itk::DivideImageFilter<ImageType, ImageType, ImageType> ScaledDistanceMapFilter;
+  ScaledDistanceMapFilter::Pointer scaledDistanceMapFilter = ScaledDistanceMapFilter::New();
+  scaledDistanceMapFilter->SetConstant1(10);
+  scaledDistanceMapFilter->SetInput(distanceMapFilter->GetOutput());
+  //write it to a file:
+  DistanceMapWriterType::Pointer scaledDistanceMapWriter = DistanceMapWriterType::New();
+  scaledDistanceMapWriter->SetInput(scaledDistanceMapFilter->GetOutput());
+  scaledDistanceMapWriter->SetFileName(distanceMapFileName);
+  scaledDistanceMapWriter->Update();
+
+
+  //Get the new scaled distance map as an Image:
+  ImageType::Pointer distanceMap = scaledDistanceMapFilter->GetOutput();
+  scaledDistanceMapFilter->Update();
+*/
+
 
   //Perform some kind of BSpline on Image
-  //Extract subject image from reader
-  ImageType::Pointer subject = imageReader->GetOutput();
-  imageReader->Update();
 
   //Setup BSpline
   const unsigned int BSplineOrder = 3;
@@ -117,18 +165,48 @@ int main(int argc, char **argv)
   //  but for now I will use the method from the ITK example
 
 
-  //initialize random number
-  std::srand(time(nullptr));
-
   for( unsigned int n = 0; n < numberOfNodes; ++ n)
     {
-    bSplineParams[n] = rand() % 5 + 1;                           // "x" coord;   rand number between 1 and 10
-    bSplineParams[n + numberOfNodes] = rand() % 5 + 1;      // "y" coord;
-    bSplineParams[n + numberOfNodes * 2] = rand() % 5 + 1;  // "z" coord;
+    bSplineParams[n] = myRandom();
+    bSplineParams[n + numberOfNodes] = myRandom();      // "y" coord;
+    bSplineParams[n + numberOfNodes * 2] = myRandom();  // "z" coord;
                                                                   // TODO: x,y,z seem like they are the wrong coordinate system. Get a better model
     }
 
   bSpline->SetParameters(bSplineParams);
+
+
+
+  //Get the displacement field from the bspline transform
+
+  //The displacement field is in a vector image
+  typedef itk::Vector<PixelType, Dimension > VectorPixelType;
+  typedef itk::Image< VectorPixelType, Dimension> DisplacementFieldImageType;
+
+  typedef itk::TransformToDisplacementFieldFilter< DisplacementFieldImageType, PixelType> TransformToDisplacementFilterType;
+  TransformToDisplacementFilterType::Pointer bSplineDisplacementFieldGenerator = TransformToDisplacementFilterType::New();
+  bSplineDisplacementFieldGenerator->UseReferenceImageOn();
+  bSplineDisplacementFieldGenerator->SetReferenceImage(subject);
+  bSplineDisplacementFieldGenerator->SetTransform(bSpline);
+  bSplineDisplacementFieldGenerator->Print(std::cout,0);
+
+  //return 0;
+  //Write the bspline displacement field so we can look at it
+  //DisplacementFieldImageType::Pointer bSplineDisplacementField = bSplineDisplacementFieldGenerator->GetOutput();
+  typedef itk::ImageFileWriter<DisplacementFieldImageType> DisplacementFieldWriter;
+  DisplacementFieldWriter::Pointer displacementFieldWriter = DisplacementFieldWriter::New();
+  displacementFieldWriter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
+  displacementFieldWriter->SetFileName(displacementFileName);
+  displacementFieldWriter->Update();
+
+  return 0;
+
+
+
+  //DisplacementFieldImageType::Pointer bSplineDisplacementField = bSplineDisplacementFieldGenerator->GetOutput();
+
+  //write the displacement field
+
 
   // Apply transform to image with resampler:
   typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleFilterType;

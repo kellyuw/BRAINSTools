@@ -10,6 +10,8 @@
 #
 
 FindITKUtil(BRAINSDeface_ITK
+  ITKTransform
+  ITKDistanceMap
   ITKThresholding
 )
 
