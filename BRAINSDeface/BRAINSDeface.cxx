@@ -17,13 +17,13 @@
 #include <itkDivideImageFilter.h>
 #include <itkVectorIndexSelectionCastImageFilter.h>
 #include <itkTransformFileWriter.h>
+#include <itkMultiplyImageFilter.h>
 
-double myRandom()
+inline double myRandom()
 {
-  const int min = -5;
-  const int max = 5;
+  const int min = -100;
+  const int max = 100;
   const int range = max - min;
-  std::srand(time(nullptr));
   return static_cast< double >( rand() % range +1 - max );
 }
 
@@ -57,6 +57,7 @@ int main(int argc, char **argv)
   ImageType::Pointer subject = imageReader->GetOutput();
   imageReader->Update();
   //
+
 
   //Read in the atlas label file
   typedef itk::Image<PixelType, Dimension> LabelAtlasType;
@@ -166,6 +167,7 @@ int main(int argc, char **argv)
   //  a better way would probably be to use the image coefficient array of the bspline,
   //  but for now I will use the method from the ITK example
 
+  std::srand(time(nullptr));
 
   for( unsigned int n = 0; n < numberOfNodes; ++ n)
     {
@@ -177,9 +179,23 @@ int main(int argc, char **argv)
 
   bSpline->SetParameters(bSplineParams);
 
+//Write the bspline transform
+  typedef itk::TransformFileWriter TransformWriterType;
+  TransformWriterType::Pointer transformWriter = TransformWriterType::New();
+  transformWriter->SetInput(bSpline);
+  transformWriter->SetFileName(bSplineFileName);
+  transformWriter->Update();
+
+  std::cout << "Printing bSpline paramaters" << std::endl;
+  std::cout << bSpline->GetParameters() << std::endl;
+  std::cout <<"Printing bSpline info" << std::endl;
+  bSpline->Print(std::cout,0);
+  std::cout << std::endl <<std::endl<<std::endl;
 
 
   //Get the displacement field from the bspline transform
+
+
 
   //The displacement field is in a vector image
   typedef itk::Vector<PixelType, Dimension > VectorPixelType;
@@ -190,7 +206,7 @@ int main(int argc, char **argv)
   bSplineDisplacementFieldGenerator->UseReferenceImageOn();
   bSplineDisplacementFieldGenerator->SetReferenceImage(subject);
   bSplineDisplacementFieldGenerator->SetTransform(bSpline);
-  bSplineDisplacementFieldGenerator->Print(std::cout,0);
+  //bSplineDisplacementFieldGenerator->Print(std::cout,0);
 
   //return 0;
   //Write the bspline displacement field so we can look at it
@@ -198,11 +214,36 @@ int main(int argc, char **argv)
   typedef itk::ImageFileWriter<DisplacementFieldImageType> DisplacementFieldWriter;
   DisplacementFieldWriter::Pointer displacementFieldWriter = DisplacementFieldWriter::New();
   displacementFieldWriter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
-  displacementFieldWriter->SetFileName(displacementFileName);
+  displacementFieldWriter->SetFileName(bSplineDisplacementFileName);
   displacementFieldWriter->Update();
 
-  return 0;
+  std::cout<<"done writing initial bSpline displacmentField"<<std::endl;
 
+  return 0;
+  std::cout<<"Extracting component images from displacement field"<<std::endl;
+  //multiply the displacement field by the distance map to get the "smooth displacement that doesn't affect the brain
+  //first extrace scalar elemnts from vector image
+  typedef itk::VectorIndexSelectionCastImageFilter<DisplacementFieldImageType, ImageType> ImageExtractionFilterType;
+  ImageExtractionFilterType::Pointer xTractDisplacementFilter = ImageExtractionFilterType::New();
+  ImageExtractionFilterType::Pointer yTractDisplacementFilter = ImageExtractionFilterType::New();
+  ImageExtractionFilterType::Pointer zTractDisplacementFilter = ImageExtractionFilterType::New();
+
+  xTractDisplacementFilter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
+  xTractDisplacementFilter->SetIndex(0);
+  ImageType * xDisplacement = xTractDisplacementFilter->GetOutput();
+
+  yTractDisplacementFilter->SetIndex(1);
+  ImageType * yDisplacement = yTractDisplacementFilter->GetOutput();
+
+  zTractDisplacementFilter->SetIndex(2);
+  ImageType * zDisplacement = zTractDisplacementFilter->GetOutput();
+
+  //multiply by distancemap
+
+  typedef itk::MultiplyImageFilter<ImageType, ImageType, ImageType> MultiplyFilterType;
+  MultiplyFilterType::Pointer xMult = MultiplyFilterType::New();
+
+  return 0;
 
 
   //DisplacementFieldImageType::Pointer bSplineDisplacementField = bSplineDisplacementFieldGenerator->GetOutput();
