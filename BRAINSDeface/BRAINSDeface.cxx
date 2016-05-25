@@ -27,6 +27,17 @@ double myRandom()
   return static_cast< double >( rand() % range +1 - max );
 }
 
+template< typename TImageType >
+void writeAnImage(std::string filename, TImageType* image)
+{
+
+  typedef itk::ImageFileWriter<TImageType> FileWriterType;
+  typename FileWriterType::Pointer fileWriter = FileWriterType::New();
+  fileWriter->SetInput(image);
+  fileWriter->SetFileName(filename);
+  fileWriter->Update();
+}
+
 int main(int argc, char **argv)
 {
   PARSE_ARGS;
@@ -69,12 +80,7 @@ int main(int argc, char **argv)
   maskFilter->SetUpperThreshold(1);
 
   //Write to a file
-  typedef itk::ImageFileWriter<MaskAtlasType> MaskAtlasWriterType;
-  MaskAtlasWriterType::Pointer maskAtlasWriter = MaskAtlasWriterType::New();
-
-  maskAtlasWriter->SetInput(maskFilter->GetOutput());
-  maskAtlasWriter->SetFileName(outputMask);
-  maskAtlasWriter->Update();
+  writeAnImage(outputMask, maskFilter->GetOutput());
 
   //Get a distance map to the Brain region:
   //TODO: This should be changed to the other kind of distance map that is faster(Mauer I think it is called???)
@@ -85,12 +91,8 @@ int main(int argc, char **argv)
 
 
   //Write the distance map to a file so we can see what it did:
-  typedef itk::ImageFileWriter<ImageType> DistanceMapWriterType;
-/*  DistanceMapWriterType::Pointer distanceMapWriter = DistanceMapWriterType::New();
-  distanceMapWriter->SetInput(distanceMapFilter->GetOutput());
-  distanceMapWriter->SetFileName(distanceMapFileName);
-  distanceMapWriter->Update();
-*/
+  writeAnImage(distanceMapFileName, distanceMapFilter->GetOutput());
+
 
 /*
   //scale the distance map to reduce displacement:
