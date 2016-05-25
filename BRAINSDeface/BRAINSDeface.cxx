@@ -18,6 +18,8 @@
 #include <itkVectorIndexSelectionCastImageFilter.h>
 #include <itkTransformFileWriter.h>
 #include <itkMultiplyImageFilter.h>
+#include <itkBSplineTransformInitializer.h>
+#include <itkComposeImageFilter.h>
 
 inline double myRandom()
 {
@@ -119,10 +121,28 @@ int main(int argc, char **argv)
   //Setup BSpline
   const unsigned int BSplineOrder = 3;
   typedef itk::BSplineTransform<PixelType, Dimension, BSplineOrder> BSplineTransform;
+
   BSplineTransform::Pointer bSpline = BSplineTransform::New();
+#if 0 //Set this up later
+  typedef itk::BSplineTransformInitializer<BSplineTransform> BSplineInitType;
+
+
+  BSplineInitType::Pointer bsi = BSplineInitType::New();
+  bsi->SetImage(subject);
+  bsi->SetTransform(bSpline);
+  bsi->Update();
+#endif
   //Set BSpline basic parameters
   const unsigned int BSplineControlPoints = 8;
+  BSplineTransform::MeshSizeType meshSize;                  //Setup a mesh that contains the number of controlpoints
+  meshSize.Fill(BSplineControlPoints-BSplineOrder);         //Inspired from itk example "BSplineWarping2.cxx"
 
+  bSpline->SetTransformDomainMeshSize(meshSize);            //TODO: ask if it is possible to have "uneven" control points.
+  // EG. 8 on LR axis 7 on SI 6 on AP. We did this in simple itk
+  //so it should be possible in cpp itk
+
+
+#if 1 // we should change this so we sue BSplineTransform initializer instead
   typedef ImageType::RegionType ImageRegionType;
 //  ImageRegionType subjectRegion = subject->GetLargestPossibleRegion();
   ImageRegionType subjectRegion = subject->GetBufferedRegion();
@@ -134,13 +154,7 @@ int main(int argc, char **argv)
     subject->GetSpacing()[1]*(subjectRegion.GetSize()[1]-1),
     subject->GetSpacing()[2]*(subjectRegion.GetSize()[2]-1)
     ));
-
-  BSplineTransform::MeshSizeType meshSize;                  //Setup a mesh that contains the number of controlpoints
-  meshSize.Fill(BSplineControlPoints-BSplineOrder);         //Inspired from itk example "BSplineWarping2.cxx"
-
-  bSpline->SetTransformDomainMeshSize(meshSize);            //TODO: ask if it is possible to have "uneven" control points.
-                                                            // EG. 8 on LR axis 7 on SI 6 on AP. We did this in simple itk
-                                                            //so it should be possible in cpp itk
+#endif
 
   //Get the number of paramaters/nodes required for this BSpline
   const unsigned int numberOfParameters = bSpline->GetNumberOfParameters();
@@ -218,8 +232,8 @@ int main(int argc, char **argv)
   displacementFieldWriter->Update();
 
   std::cout<<"done writing initial bSpline displacmentField"<<std::endl;
-
   return 0;
+
   std::cout<<"Extracting component images from displacement field"<<std::endl;
   //multiply the displacement field by the distance map to get the "smooth displacement that doesn't affect the brain
   //first extrace scalar elemnts from vector image
@@ -230,18 +244,40 @@ int main(int argc, char **argv)
 
   xTractDisplacementFilter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
   xTractDisplacementFilter->SetIndex(0);
-  ImageType * xDisplacement = xTractDisplacementFilter->GetOutput();
+  ImageType::Pointer   xDisplacement = xTractDisplacementFilter->GetOutput();
 
   yTractDisplacementFilter->SetIndex(1);
-  ImageType * yDisplacement = yTractDisplacementFilter->GetOutput();
+  ImageType::Pointer  yDisplacement = yTractDisplacementFilter->GetOutput();
 
   zTractDisplacementFilter->SetIndex(2);
-  ImageType * zDisplacement = zTractDisplacementFilter->GetOutput();
+  ImageType::Pointer  zDisplacement = zTractDisplacementFilter->GetOutput();
 
   //multiply by distancemap
 
   typedef itk::MultiplyImageFilter<ImageType, ImageType, ImageType> MultiplyFilterType;
   MultiplyFilterType::Pointer xMult = MultiplyFilterType::New();
+  MultiplyFilterType::Pointer yMult = MultiplyFilterType::New();
+  MultiplyFilterType::Pointer zMult = MultiplyFilterType::New();
+
+  xMult->SetInput1(xDisplacement);
+  xMult->SetInput2(distanceMapFilter->GetOutput());
+
+  yMult->SetInput1(yDisplacement);
+  yMult->SetInput2(distanceMapFilter->GetOutput());
+
+  zMult->SetInput1(zDisplacement);
+  zMult->SetInput2(distanceMapFilter->GetOutput());
+
+  typedef itk::ComposeImageFilter<ImageType, DisplacementFieldImageType> ComposeFilterType;
+  ComposeFilterType::Pointer composeDisplacements = ComposeFilterType::New();
+  composeDisplacements->SetInput(0, xMult->GetOutput());
+  composeDisplacements->SetInput(1, yMult->GetOutput());
+  composeDisplacements->SetInput(2, zMult->GetOutput());
+
+  //write the new displacement image
+  writeAnImage(smoothDisplacementName, composeDisplacements->GetOutput());
+
+  std::cout<<"done writing smooth displacement" <<std::endl;
 
   return 0;
 
