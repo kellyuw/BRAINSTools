@@ -20,13 +20,15 @@
 #include <itkMultiplyImageFilter.h>
 #include <itkBSplineTransformInitializer.h>
 #include <itkComposeImageFilter.h>
+#include <itkDisplacementFieldTransform.h>
+#include <itkSubtractImageFilter.h>
 
 inline double myRandom()
 {
-  const int min = -100;
-  const int max = 100;
+  const int min = -5;
+  const int max = 5;
   const int range = max - min;
-  return static_cast< double >( rand() % range +1 - max );
+  return static_cast< double >( rand() % range +1 - max )*0.05;
 }
 
 template< typename TImageType >
@@ -222,17 +224,9 @@ int main(int argc, char **argv)
   bSplineDisplacementFieldGenerator->SetTransform(bSpline);
   //bSplineDisplacementFieldGenerator->Print(std::cout,0);
 
-  //return 0;
-  //Write the bspline displacement field so we can look at it
-  //DisplacementFieldImageType::Pointer bSplineDisplacementField = bSplineDisplacementFieldGenerator->GetOutput();
-  typedef itk::ImageFileWriter<DisplacementFieldImageType> DisplacementFieldWriter;
-  DisplacementFieldWriter::Pointer displacementFieldWriter = DisplacementFieldWriter::New();
-  displacementFieldWriter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
-  displacementFieldWriter->SetFileName(bSplineDisplacementFileName);
-  displacementFieldWriter->Update();
+  writeAnImage(bSplineDisplacementFileName, bSplineDisplacementFieldGenerator->GetOutput());
 
   std::cout<<"done writing initial bSpline displacmentField"<<std::endl;
-  return 0;
 
   std::cout<<"Extracting component images from displacement field"<<std::endl;
   //multiply the displacement field by the distance map to get the "smooth displacement that doesn't affect the brain
@@ -246,13 +240,23 @@ int main(int argc, char **argv)
   xTractDisplacementFilter->SetIndex(0);
   ImageType::Pointer   xDisplacement = xTractDisplacementFilter->GetOutput();
 
+
+  //writeAnImage("/scratch/aleinoff/defaceOutput/testImageVectorIndexSelectionCastFilterOutput.nii.gz", xTractDisplacementFilter->GetOutput());
+  //std::cout<<"done writing test image"<<std::endl;
+  //return 0;
+
+
+  yTractDisplacementFilter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
   yTractDisplacementFilter->SetIndex(1);
   ImageType::Pointer  yDisplacement = yTractDisplacementFilter->GetOutput();
 
+  zTractDisplacementFilter->SetInput(bSplineDisplacementFieldGenerator->GetOutput());
   zTractDisplacementFilter->SetIndex(2);
   ImageType::Pointer  zDisplacement = zTractDisplacementFilter->GetOutput();
 
   //multiply by distancemap
+
+  std::cout<<"Multiplying bSplineDisplacement by Distance map"<<std::endl;
 
   typedef itk::MultiplyImageFilter<ImageType, ImageType, ImageType> MultiplyFilterType;
   MultiplyFilterType::Pointer xMult = MultiplyFilterType::New();
@@ -261,12 +265,22 @@ int main(int argc, char **argv)
 
   xMult->SetInput1(xDisplacement);
   xMult->SetInput2(distanceMapFilter->GetOutput());
+  ImageType::Pointer xMultImage = xMult->GetOutput();
+  xMult->Update();
+
 
   yMult->SetInput1(yDisplacement);
   yMult->SetInput2(distanceMapFilter->GetOutput());
+  ImageType::Pointer yMultImage = yMult->GetOutput();
+  yMult->Update();
+
 
   zMult->SetInput1(zDisplacement);
   zMult->SetInput2(distanceMapFilter->GetOutput());
+  ImageType::Pointer zMultImage = zMult->GetOutput();
+  zMult->Update();
+
+  std::cout<<"Composing new image from displacement and bSpline product components"<<std::endl;
 
   typedef itk::ComposeImageFilter<ImageType, DisplacementFieldImageType> ComposeFilterType;
   ComposeFilterType::Pointer composeDisplacements = ComposeFilterType::New();
@@ -277,9 +291,16 @@ int main(int argc, char **argv)
   //write the new displacement image
   writeAnImage(smoothDisplacementName, composeDisplacements->GetOutput());
 
-  std::cout<<"done writing smooth displacement" <<std::endl;
+  DisplacementFieldImageType::Pointer composedDisplacementField = composeDisplacements->GetOutput();
+  composedDisplacementField->Update();
 
-  return 0;
+  //write composed displacement field into a displacement transform
+
+  typedef itk::DisplacementFieldTransform<PixelType, Dimension> FinalTransformType;
+  FinalTransformType::Pointer finalTransform = FinalTransformType::New();
+  finalTransform->SetDisplacementField(composedDisplacementField);
+
+
 
 
   //DisplacementFieldImageType::Pointer bSplineDisplacementField = bSplineDisplacementFieldGenerator->GetOutput();
@@ -302,15 +323,29 @@ int main(int argc, char **argv)
   resampler->SetOutputStartIndex(subjectRegion.GetIndex());
 
   resampler->SetInput(imageReader->GetOutput());
-  resampler->SetTransform(bSpline);
+  //resampler->SetTransform(bSpline);
+  resampler->SetTransform(finalTransform);
 
 
-  //Setup ImageWriter
+
+  writeAnImage(deformedImageName,resampler->GetOutput());
+
+  //Get the difference image
+  typedef itk::SubtractImageFilter<ImageType, ImageType> SubtractFilter;
+  SubtractFilter::Pointer subtractFilter = SubtractFilter::New();
+  subtractFilter->SetInput1(subject);
+  subtractFilter->SetInput2(resampler->GetOutput());
+
+  //write the difference Image
+  writeAnImage("/scratch/aleinoff/defaceOutput/diffImage.nii.gz", subtractFilter->GetOutput());
+
+  /*
   typedef itk::ImageFileWriter<ImageType> DeformedSubjectFileWriterType;
   DeformedSubjectFileWriterType::Pointer deformedWriter = DeformedSubjectFileWriterType::New();
   deformedWriter->SetFileName(deformedImageName);
   deformedWriter->SetInput(resampler->GetOutput());
   deformedWriter->Update();
+   */
   std::cout << "Finished writing file " << std::endl;
   std::cout << "done" << std::endl;
 

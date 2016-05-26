@@ -76,7 +76,7 @@
     <label>bSpline and distance Displacement Map file name</label>
     <name>smoothDisplacementName</name>
     <channel>output</channel>
-    <longflag>ismoothDisplacementName</longflag>
+    <longflag>smoothDisplacementName</longflag>
     <description>A name for the Displaement Field combined with the distance map</description>
     <default>None</default>
   </image>
