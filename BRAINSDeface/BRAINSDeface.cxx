@@ -201,14 +201,6 @@ int main(int argc, char **argv)
 
   bSpline->SetParameters(bSplineParams);
 
-//Write the bspline transform
-  /*
-  typedef itk::TransformFileWriter TransformWriterType;
-  TransformWriterType::Pointer transformWriter = TransformWriterType::New();
-  transformWriter->SetInput(bSpline);
-  transformWriter->SetFileName(bSplineFileName);
-  transformWriter->Update();
-*/
   WriteTransform(bSplineFileName, bSpline);
   std::cout << "Printing bSpline paramaters" << std::endl;
   std::cout << bSpline->GetParameters() << std::endl;
@@ -346,13 +338,6 @@ int main(int argc, char **argv)
   //write the difference Image
   WriteImage("/scratch/aleinoff/defaceOutput/diffImage.nii.gz", subtractFilter->GetOutput());
 
-  /*
-  typedef itk::ImageFileWriter<ImageType> DeformedSubjectFileWriterType;
-  DeformedSubjectFileWriterType::Pointer deformedWriter = DeformedSubjectFileWriterType::New();
-  deformedWriter->SetFileName(deformedImageName);
-  deformedWriter->SetInput(resampler->GetOutput());
-  deformedWriter->Update();
-   */
   std::cout << "Finished writing file " << std::endl;
   std::cout << "done" << std::endl;
 
