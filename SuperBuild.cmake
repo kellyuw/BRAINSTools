@@ -311,6 +311,7 @@ mark_as_superbuild(
   USE_BRAINSMush:BOOL
   USE_BRAINSROIAuto:BOOL
   USE_BRAINSResample:BOOL
+  USE_BRAINSSuperResolution:BOOL
   USE_BRAINSConstellationDetector:BOOL
   USE_BRAINSDemonWarp:BOOL
   USE_BRAINSMultiModeSegment:BOOL
@@ -414,6 +415,7 @@ ExternalProject_Add(${proj}
     -DUSE_BRAINSPosteriorToContinuousClass:BOOL=${USE_BRAINSPosteriorToContinuousClass}
     -DUSE_BRAINSROIAuto:BOOL=${USE_BRAINSROIAuto}
     -DUSE_BRAINSResample:BOOL=${USE_BRAINSResample}
+    -DUSE_BRAINSSuperResolution:BOOL=${USE_BRAINSSuperResolution}
     -DUSE_BRAINSSnapShotWriter:BOOL=${USE_BRAINSSnapShotWriter}
     -DUSE_BRAINSStripRotation:BOOL=${USE_BRAINSStripRotation}
     -DUSE_BRAINSSurfaceTools:BOOL=${USE_BRAINSSurfaceTools}

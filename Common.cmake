@@ -79,6 +79,7 @@ option(USE_ConvertBetweenFileFormats      "Build ConvertBetweenFileFormats"     
 option(USE_BRAINSDWICleanup               "Build BRAINSDWICleanup"               ON)
 option(USE_BRAINSCreateLabelMapFromProbabilityMaps "Build BRAINSCreateLabelMapFromProbabilityMaps" OFF)
 option(USE_BRAINSSnapShotWriter           "Build BRAINSSnapShotWriter"           ON)
+option(USE_BRAINSSuperResolution          "Build BRAINSSuperResolution"          OFF)
 
 if(CMAKE_CXX_STANDARD LESS 11)
   option(USE_BRAINSABC                      "Build BRAINSABC"                      OFF)

@@ -39,7 +39,7 @@ int main( int argc, char * argv[] )
   typedef itk::Image<PixelType, Dim>                  InputImageType;
   typedef InputImageType::Pointer                     InputImagePointer;
   typedef std::vector<InputImagePointer>              InputImageList;
-  typedef itk::ImageFileReader<InputImageType>        LocalReaderType;
+  typedef itk::ImageFileReader<InputImageType>        ImageReaderType;
 
   std::vector<std::string> inputMRFileNames;
   if( inputMRVolumes.size() > 0 )
@@ -54,13 +54,13 @@ int main( int argc, char * argv[] )
   const unsigned int numberOfMRImages = inputMRFileNames.size(); // number of modality images
 
   // Read the input MR modalities and set them in a vector of images
-  typedef LocalReaderType::Pointer             LocalReaderPointer;
+  typedef ImageReaderType::Pointer             LocalReaderPointer;
 
   InputImageList inputMRImageModalitiesList;
   for( unsigned int i = 0; i < numberOfMRImages; i++ )
     {
     std::cout << "Reading image: " << inputMRFileNames[i] << std::endl;
-    LocalReaderPointer imgreader = LocalReaderType::New();
+    LocalReaderPointer imgreader = ImageReaderType::New();
     imgreader->SetFileName( inputMRFileNames[i].c_str() );
     try
       {
