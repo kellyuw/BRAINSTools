@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
       }
     catch( ... )
       {
-      std::cout << "ERROR:  Could not read image " << inputMRFileNames[i] << "." << std::endl;
+      std::cerr << "ERROR:  Could not read image " << inputMRFileNames[i] << "." << std::endl;
       return EXIT_FAILURE;
       }
     inputMRImageModalitiesList.push_back( imgreader->GetOutput() );
@@ -103,6 +103,7 @@ int main( int argc, char * argv[] )
     }
 
   // Read the input DWI image
+  std::cout << "Reading DWI image: " << inputVolumeDWI << std::endl;
   ImageReaderType::Pointer dwi_b0_imageReader = ImageReaderType::New();
   dwi_b0_imageReader->SetFileName(inputVolumeDWI);
   try
@@ -111,7 +112,7 @@ int main( int argc, char * argv[] )
     }
   catch( ... )
     {
-    std::cout << "ERROR:  Could not read image " << inputVolumeDWI << "." << std::endl;
+    std::cerr << "ERROR:  Could not read image " << inputVolumeDWI << "." << std::endl;
     return EXIT_FAILURE;
     }
   InputImagePointer dwi_b0 = dwi_b0_imageReader->GetOutput();
