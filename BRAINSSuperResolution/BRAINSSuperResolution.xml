@@ -17,29 +17,23 @@
       <description>Input image files names (.nii.gz or .nrrd)</description>
     </string-vector>
     <image>
-      <name>inputVolumeT1</name>
-      <longflag>inputVolumeT1</longflag>
-      <description>input volume T1</description>
-      <channel>input</channel>
-    </image>
-    <image>
-      <name>inputVolumeT2</name>
-      <longflag>inputVolumeT2</longflag>
-      <description>input volume T2</description>
-      <channel>input</channel>
-    </image>
-    <image>
       <name>inputVolumeDWI</name>
       <longflag>inputVolumeDWI</longflag>
       <description>Low-resolution input DWI volume</description>
       <channel>input</channel>
     </image>
-    <file>
+    <image fileExtensions=".nii.gz,.nrrd">
       <name>outputFileName</name>
       <longflag>outputFileName</longflag>
       <description>(required) output file name</description>
       <channel>output</channel>
-    </file>
+    </image>
+    <image fileExtensions=".nii.gz,.nrrd">
+      <name>outputEdgeMap</name>
+      <longflag>outputEdgeMap</longflag>
+      <description>output edgemap file name</description>
+      <channel>output</channel>
+    </image>
     <integer>
       <name>numberOfThreads</name>
       <longflag deprecatedalias="debugNumberOfThreads" >numberOfThreads</longflag>

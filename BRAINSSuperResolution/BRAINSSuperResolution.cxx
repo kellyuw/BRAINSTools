@@ -79,7 +79,30 @@ int main( int argc, char * argv[] )
     inputMRImageModalitiesList.push_back( imgreader->GetOutput() );
     }
 
+  // Create maximum gradient image using the input structural MR images.
+  EdgeMapImageType::Pointer maxGI = GenerateMaxGradientImage<
+    InputImageType,EdgeMapImageType>(inputMRImageModalitiesList);
 
+  if( outputEdgeMap.compare( "" ) != 0 )
+    {
+    typedef itk::ImageFileWriter<EdgeMapImageType> WriterType;
+    WriterType::Pointer writer = WriterType::New();
+    writer->UseCompressionOn();
+    writer->SetFileName( outputEdgeMap );
+    writer->SetInput( maxGI );
+    try
+      {
+      writer->Update();
+      }
+    catch( itk::ExceptionObject & exp )
+      {
+      std::cerr << "ExceptionObject with writer" << std::endl;
+      std::cerr << exp << std::endl;
+      return EXIT_FAILURE;
+      }
+    }
+
+  // Read the input DWI image
   ImageReaderType::Pointer dwi_b0_imageReader = ImageReaderType::New();
   dwi_b0_imageReader->SetFileName(inputVolumeDWI);
   try
@@ -93,8 +116,6 @@ int main( int argc, char * argv[] )
     }
   InputImagePointer dwi_b0 = dwi_b0_imageReader->GetOutput();
 
-  EdgeMapImageType::Pointer maxGI = GenerateMaxGradientImage<
-    InputImageType,EdgeMapImageType>(inputMRImageModalitiesList);
 
   return EXIT_SUCCESS;
 }
