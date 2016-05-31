@@ -10,8 +10,10 @@
 #
 
 FindITKUtil(BRAINSSuperResolution_ITK
+  ITKImageFilterBase
   ITKImageFunction
   ITKImageGrid
+  ITKImageGradient
   ITKImageIntensity
   ITKImageSources
   ITKImageStatistics

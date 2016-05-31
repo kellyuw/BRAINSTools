@@ -26,6 +26,8 @@
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
 
+#include "GenerateMaxGradientImage.h"
+
 #include "BRAINSSuperResolutionCLP.h"
 #include <BRAINSCommonLib.h>
 
@@ -40,6 +42,9 @@ int main( int argc, char * argv[] )
   typedef InputImageType::Pointer                     InputImagePointer;
   typedef std::vector<InputImagePointer>              InputImageList;
   typedef itk::ImageFileReader<InputImageType>        ImageReaderType;
+
+  typedef unsigned char                               EdgeMapPixelType;
+  typedef itk::Image<EdgeMapPixelType, Dim>           EdgeMapImageType;
 
   std::vector<std::string> inputMRFileNames;
   if( inputMRVolumes.size() > 0 )
@@ -88,7 +93,8 @@ int main( int argc, char * argv[] )
     }
   InputImagePointer dwi_b0 = dwi_b0_imageReader->GetOutput();
 
-
+  EdgeMapImageType::Pointer maxGI = GenerateMaxGradientImage<
+    InputImageType,EdgeMapImageType>(inputMRImageModalitiesList);
 
   return EXIT_SUCCESS;
 }
