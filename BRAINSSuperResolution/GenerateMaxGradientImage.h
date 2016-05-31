@@ -25,7 +25,6 @@
 #ifndef __GenerateMaxGradientImage_h
 #define __GenerateMaxGradientImage_h
 
-//#include "itkImage.h"
 #include "itkGradientMagnitudeImageFilter.h"
 #include "itkScalarImageToHistogramGenerator.h"
 #include "itkMinimumMaximumImageCalculator.h"

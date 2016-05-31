@@ -80,7 +80,7 @@ int main( int argc, char * argv[] )
     }
 
   // Create maximum gradient image using the input structural MR images.
-  EdgeMapImageType::Pointer maxGI = GenerateMaxGradientImage<
+  EdgeMapImageType::Pointer edgeMap = GenerateMaxGradientImage<
     InputImageType,EdgeMapImageType>(inputMRImageModalitiesList);
 
   if( outputEdgeMap.compare( "" ) != 0 )
@@ -89,7 +89,7 @@ int main( int argc, char * argv[] )
     WriterType::Pointer writer = WriterType::New();
     writer->UseCompressionOn();
     writer->SetFileName( outputEdgeMap );
-    writer->SetInput( maxGI );
+    writer->SetInput( edgeMap );
     try
       {
       writer->Update();
