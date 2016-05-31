@@ -155,6 +155,7 @@ GenerateMaxGradientImage(const std::vector<typename InputImageType::Pointer> & i
      rescaler->SetWindowMinimum( ith_histogram->Quantile(0, LowerPercentileMatching) );
      rescaler->SetWindowMaximum( ith_histogram->Quantile(0, UpperPercentileMatching) + slope * 100.0
                                    * ( 1.0 - UpperPercentileMatching ) );
+     rescaler->Update();
 
      rescaledGradientImageList[i] = rescaler->GetOutput();
      }
