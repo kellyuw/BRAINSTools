@@ -20,7 +20,7 @@
 #include <itkDisplacementFieldTransform.h>
 #include <itkSubtractImageFilter.h>
 
-#include "createRandomBSpline.h"
+#include "CreateRandomBSpline.h"
 #include "CombineBSplineWithDisplacement.h"
 
 //Convienience function to write images
