@@ -26,20 +26,10 @@
 #include "createRandomBSpline.h"
 #include "CombineBSplineWithDisplacement.h"
 
-
-inline double myRandom()
-{
-  const int min = -5;
-  const int max = 5;
-  const int range = max - min;
-  return static_cast< double >( rand() % range +1 - max )*0.05;
-}
-
 //Convienience function to write images
 template< typename TImageType >
 void WriteImage(std::string filename, TImageType *image)
 {
-
   typedef itk::ImageFileWriter<TImageType> FileWriterType;
   typename FileWriterType::Pointer fileWriter = FileWriterType::New();
 
@@ -59,8 +49,6 @@ void WriteTransform(std::string transformFileName, TTransformType transform )
   transformWriter->SetFileName(transformFileName);
   transformWriter->Update();
 }
-
-
 
 int main(int argc, char **argv)
 {
