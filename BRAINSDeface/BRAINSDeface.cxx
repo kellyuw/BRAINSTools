@@ -133,7 +133,7 @@ TBSplineType createRandomBSpline(TImageType subject, const int Dimension, const 
   typedef itk::BSplineTransform<PixelType, Dimension, BSplineOrder> BSTransformType;
 
   //BSTransformType::Pointer bSpline = createRandomBSpline2<ImageType, BSTransformType>(subject, Dimension, BSplineOrder, BSplineControlPoints );
-  typedef createRandomBSpline<ImageType, PixelType, 3, 3> Test; //, BSTransformType> Test;
+  typedef CreateRandomBSpline<ImageType, PixelType, 3, 3> Test; //, BSTransformType> Test;
   Test::Pointer myTest = Test::New();
   myTest->SetInput(subject);
   myTest->SetBSplineControlPoints(8);

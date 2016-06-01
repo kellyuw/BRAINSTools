@@ -12,11 +12,11 @@ template<typename TInputImage,
   typename TPixelType,
     unsigned int NDimension,
       unsigned int NBSplineOrder>
-class createRandomBSpline
+class CreateRandomBSpline
   : public itk::ImageToImageFilter< TInputImage, TInputImage>
 {
 public:
-  typedef createRandomBSpline Self;
+  typedef CreateRandomBSpline Self;
   typedef itk::SmartPointer <Self> Pointer;
 
   typedef itk::BSplineTransform<TPixelType,NDimension,NBSplineOrder> BSplineType;
@@ -35,11 +35,11 @@ public:
   typedef TInputImage ImageType;
 
 protected:
-  createRandomBSpline()
+  CreateRandomBSpline()
   {
     m_BSplineOutput=BSplineType::New();
   };
-  ~createRandomBSpline(){};
+  ~CreateRandomBSpline(){};
   //void PrintSelf( std::ostream & os, itk::Indent indent ) const ITK_OVERRIDE;
 
   void GenerateData() ITK_OVERRIDE
