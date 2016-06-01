@@ -10,8 +10,6 @@
 #include <Slicer3LandmarkIO.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBSplineTransform.h>
-#include <stdlib.h>
-#include <time.h>
 #include <itkResampleImageFilter.h>
 #include <itkDanielssonDistanceMapImageFilter.h>
 #include <itkDivideImageFilter.h>
