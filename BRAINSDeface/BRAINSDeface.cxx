@@ -101,16 +101,14 @@ int main(int argc, char **argv)
 
   typedef itk::BSplineTransform<PixelType, Dimension, BSplineOrder> BSTransformType;
 
-  //BSTransformType::Pointer bSpline = createRandomBSpline2<ImageType, BSTransformType>(subject, Dimension, BSplineOrder, BSplineControlPoints );
-  typedef CreateRandomBSpline<ImageType, PixelType, 3, 3> Test; //, BSTransformType> Test;
-  Test::Pointer myTest = Test::New();
-  myTest->SetInput(subject);
-  myTest->SetBSplineControlPoints(8);
+  typedef CreateRandomBSpline<ImageType, PixelType, 3, 3> BSplineCreator; //, BSTransformType> Test;
+  BSplineCreator::Pointer bSplineCreator = BSplineCreator::New();
+  bSplineCreator->SetInput(subject);
+  bSplineCreator->SetBSplineControlPoints(8);
+  bSplineCreator->Update();
+  BSTransformType::Pointer bSpline = bSplineCreator->GetBSplineOutput();
 
-  myTest->Update();
-  BSTransformType::Pointer bSpline = myTest->GetBSplineOutput();
-
-  myTest->Print(std::cerr,5);
+  bSplineCreator->Print(std::cerr,5);
 
   WriteTransform(bSplineFileName, bSpline);
   std::cout << "Printing bSpline paramaters" << std::endl;
