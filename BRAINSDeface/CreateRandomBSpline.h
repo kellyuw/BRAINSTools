@@ -30,8 +30,12 @@ public:
 
   itkSetMacro(RandMin, int)
   itkGetMacro(RandMin, int)
+
   itkSetMacro(RandMax, int)
   itkGetMacro(RandMax, int)
+
+  itkSetMacro(RandScale, double)
+  itkGetMacro(RandScale, double)
 
   typedef TInputImage ImageType;
 
@@ -92,12 +96,13 @@ private:
     const int min = this->GetRandMin();
     const int max = this->GetRandMax();
     const int range = max - min;
-    return static_cast< double >( rand() % range +1 - max )*0.05;
+    return static_cast< double >( rand() % range +1 - max ) * this->GetRandScale();
   }
 
   BSplinePointer m_BSplineOutput;
   unsigned int m_BSplineControlPoints;
   int m_RandMin;
   int m_RandMax;
+  double m_RandScale = 0.05;
 };
 #endif //BRAINSTOOLS_CREATERANDOMBSPLINE_H
