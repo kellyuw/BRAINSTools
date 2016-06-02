@@ -88,12 +88,12 @@
     <description>difference of subject image and transformed image</description>
     <default>None-diffImage</default>
   </image>
-    <file fileExtensions=".fcsv">
-       <label>Landmarks File</label>
-       <channel>input</channel>
-       <longflag>landmarks</longflag>
-       <description>The landmarks file</description>
-       <default>None</default>
-    </file>
+  <file fileExtensions=".fcsv">
+     <label>Landmarks File</label>
+     <channel>input</channel>
+     <longflag>landmarks</longflag>
+     <description>The landmarks file</description>
+     <default>None</default>
+  </file>
   </parameters>
 </executable>
