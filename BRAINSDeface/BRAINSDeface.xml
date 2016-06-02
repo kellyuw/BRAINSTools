@@ -105,5 +105,44 @@
   <parameters>
     <label>Control Options</label>
     <description>These parameters control the various options</description>
+    <integer>
+      <label>Max Random</label>
+      <name>maxRandom</name>
+      <channel>input</channel>
+      <longflag>maxRandom</longflag>
+      <description>The maximum range of randomness of the BSPline</description>
+      <default>5</default>
+      <constraints>
+        <maximum>10</maximum>
+        <minimum>-10</minimum>
+        <step>1</step>
+      </constraints>
+    </integer>
+    <integer>
+      <label>Min Random</label>
+      <name>minRandom</name>
+      <channel>input</channel>
+      <longflag>minRandom</longflag>
+      <description>The minimum range of randomness of the BSPline</description>
+      <default>-5</default>
+      <constraints>
+        <maximum>10</maximum>
+        <minimum>-10</minimum>
+        <step>1</step>
+      </constraints>
+    </integer>
+    <double>
+      <label>Random Scale</label>
+      <name>scaleRandom</name>
+      <channel>input</channel>
+      <longflag>scaleRandom</longflag>
+      <description>The amount the randomness is scaled by</description>
+      <default>0.05</default>
+      <constraints>
+        <maximum>1.00</maximum>
+        <minimum>0.005</minimum>
+        <step>0.005</step>
+      </constraints>
+    </double>
   </parameters>
 </executable>
