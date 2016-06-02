@@ -144,5 +144,20 @@
         <step>0.005</step>
       </constraints>
     </double>
+    <integer>
+      <label>BSpline Control Points</label>
+      <name>bsplineControlPoints</name>
+      <channel>input</channel>
+      <longflag>bsplineControlPoints</longflag>
+      <description>The number of bspline control points in each direction</description>
+      <default>8</default>
+      <constraints>
+        <!-- what should the contraits actually be??
+             what would make sense and why?? -->
+        <minimum>1</minimum>
+        <maximum>50</maximum>
+        <step>1</step>
+      </constraints>
+    </integer>
   </parameters>
 </executable>

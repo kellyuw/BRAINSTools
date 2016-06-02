@@ -26,7 +26,7 @@ public:
   itkGetMacro(BSplineOutput, BSplinePointer)
 
   itkSetMacro(BSplineControlPoints, unsigned int)
-  itkGetMacro(BSplineControlPoints,  unsigned int)
+  itkGetMacro(BSplineControlPoints, unsigned int)
 
   itkSetMacro(RandMin, int)
   itkGetMacro(RandMin, int)
@@ -43,8 +43,9 @@ protected:
   CreateRandomBSpline()
   {
     m_BSplineOutput=BSplineType::New();
-    m_RandMax = 5;
-    m_RandMin = -5;
+    m_BSplineControlPoints = 8; //default value
+    m_RandMax = 5; //default value
+    m_RandMin = -5; //default value
   };
   ~CreateRandomBSpline(){};
 

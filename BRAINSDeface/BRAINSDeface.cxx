@@ -99,29 +99,20 @@ int main(int argc, char **argv)
   const int BSplineOrder = 3;
   const int BSplineControlPoints = 8;
 
-  typedef itk::BSplineTransform<PixelType, Dimension, BSplineOrder> BSTransformType;
 
   typedef CreateRandomBSpline<ImageType, PixelType, Dimension, BSplineOrder> BSplineCreator; //, BSTransformType> Test;
   BSplineCreator::Pointer bSplineCreator = BSplineCreator::New();
   bSplineCreator->SetInput(subject);
-  bSplineCreator->SetBSplineControlPoints(8);
+  bSplineCreator->SetBSplineControlPoints(bsplineControlPoints);
   bSplineCreator->SetRandMax(maxRandom);
   bSplineCreator->SetRandMin(minRandom);
   bSplineCreator->SetRandScale(scaleRandom);
   bSplineCreator->Update();
+
+  typedef itk::BSplineTransform<PixelType, Dimension, BSplineOrder> BSTransformType;
   BSTransformType::Pointer bSpline = bSplineCreator->GetBSplineOutput();
 
-  bSplineCreator->Print(std::cerr,5);
-
   WriteTransform(bSplineFileName, bSpline);
-  std::cout << "Printing bSpline paramaters" << std::endl;
-  std::cout << bSpline->GetParameters() << std::endl;
-
-  std::cout <<"Printing bSpline info" << std::endl;
-
-  bSpline->Print(std::cout,0);
-  std::cout<<   "printed bspline info"<<std::endl;
-  std::cout << std::endl <<std::endl<<std::endl;
 
   typedef itk::Vector<PixelType, Dimension > VectorPixelType;
   typedef itk::Image< VectorPixelType, Dimension> DisplacementFieldImageType;
