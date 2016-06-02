@@ -101,10 +101,13 @@ int main(int argc, char **argv)
 
   typedef itk::BSplineTransform<PixelType, Dimension, BSplineOrder> BSTransformType;
 
-  typedef CreateRandomBSpline<ImageType, PixelType, 3, 3> BSplineCreator; //, BSTransformType> Test;
+  typedef CreateRandomBSpline<ImageType, PixelType, Dimension, BSplineOrder> BSplineCreator; //, BSTransformType> Test;
   BSplineCreator::Pointer bSplineCreator = BSplineCreator::New();
   bSplineCreator->SetInput(subject);
   bSplineCreator->SetBSplineControlPoints(8);
+  bSplineCreator->SetRandMax(maxRandom);
+  bSplineCreator->SetRandMin(minRandom);
+  bSplineCreator->SetRandScale(scaleRandom);
   bSplineCreator->Update();
   BSTransformType::Pointer bSpline = bSplineCreator->GetBSplineOutput();
 
