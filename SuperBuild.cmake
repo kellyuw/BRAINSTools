@@ -402,6 +402,7 @@ ExternalProject_Add(${proj}
     -DUSE_BRAINSContinuousClass:BOOL=${USE_BRAINSContinuousClass}
     -DUSE_BRAINSCreateLabelMapFromProbabilityMaps:BOOL=${USE_BRAINSCreateLabelMapFromProbabilityMaps}
     -DUSE_BRAINSCut:BOOL=${USE_BRAINSCut}
+    -DUSE_BRAINSDeface:Boole=${USE_BRAINSDeface}
     -DUSE_BRAINSDWICleanup:BOOL=${USE_BRAINSDWICleanup}
     -DUSE_BRAINSDemonWarp:BOOL=${USE_BRAINSDemonWarp}
     -DUSE_BRAINSFit:BOOL=${USE_BRAINSFit}

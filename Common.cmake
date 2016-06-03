@@ -122,7 +122,6 @@ if(NOT ${PRIMARY_PROJECT_NAME}_REQUIRES_VTK)
 endif()
 
 option(USE_BRAINSDeface "BRAINSDeface is still under development." OFF)
-mark_as_advanced(USE_BRAINSDeface)
 
 if(USE_ICCDEF OR ITK_USE_FFTWD OR ITK_USE_FFTWF)
   set(${PROJECT_NAME}_BUILD_FFTWF_SUPPORT ON)
