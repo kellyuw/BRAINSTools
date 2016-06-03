@@ -115,7 +115,7 @@ int main(int argc, char **argv)
   BSTransformType::Pointer bSpline = bSplineCreator->GetBSplineOutput();
 
   WriteTransform(bSplineFileName, bSpline);
-
+//return 0;
   typedef itk::Vector<PixelType, Dimension > VectorPixelType;
   typedef itk::Image< VectorPixelType, Dimension> DisplacementFieldImageType;
 
@@ -130,6 +130,7 @@ int main(int argc, char **argv)
   //write the new displacement image
   DisplacementFieldImageType* composedDisplacementField_rawPtr = combiner->GetComposedImage();
   WriteImage(smoothDisplacementName, composedDisplacementField_rawPtr);
+
 
   //write composed displacement field into a displacement transform
 
