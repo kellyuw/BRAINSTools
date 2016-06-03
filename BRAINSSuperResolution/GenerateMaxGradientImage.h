@@ -112,9 +112,11 @@ GenerateMaxGradientImage(const std::vector<typename InputImageType::Pointer> & i
   itk::TimeProbe MaxGradientImageTimer;
   MaxGradientImageTimer.Start();
 
+  const float LowerPercentileMatching = 0.50F; // Map 50th Quantile and below to minOutputRange
+  const float UpperPercentileMatching = 0.95F; // Map 95th Quantile and above to maxOutputRange
 
-  const float UpperPercentileMatching = 0.95F; // Map 95th Quantile and above to 127
-  const float LowerPercentileMatching = 0.50F; // Map 25th Quantile and below to 0
+  const unsigned int minOutputRange = 1; // epsilon
+  //const unsigned int maxOutputRange = 100;
 
   const unsigned int numberOfImageModalities =
     inputImages.size(); // number of modality images
@@ -144,23 +146,27 @@ GenerateMaxGradientImage(const std::vector<typename InputImageType::Pointer> & i
      histogramGenerator->Compute();
      typename HistogramType::ConstPointer ith_histogram = histogramGenerator->GetOutput();
 
+     // maximum is defined such that (Max - Epsilon)/2 = Q(%85)
+     unsigned int maxOutputRange = 2 * ith_histogram->Quantile(0, 0.85F) + minOutputRange;
+     if( maxOutputRange > 255 )
+       {
+       maxOutputRange = 255;
+       }
+
      typename RescalerType::Pointer rescaler = RescalerType::New();
      rescaler->SetInput( gradientFilter->GetOutput() );
-     rescaler->SetOutputMinimum(0);
-     rescaler->SetOutputMaximum(127);
-     const float slope =
-       ( ith_histogram->Quantile(0, UpperPercentileMatching)
-         - ith_histogram->Quantile(0, LowerPercentileMatching) ) / 80.0F;
+     rescaler->SetOutputMinimum( minOutputRange );
+     rescaler->SetOutputMaximum( maxOutputRange );
      rescaler->SetWindowMinimum( ith_histogram->Quantile(0, LowerPercentileMatching) );
-     rescaler->SetWindowMaximum( ith_histogram->Quantile(0, UpperPercentileMatching) + slope * 100.0
-                                   * ( 1.0 - UpperPercentileMatching ) );
+     rescaler->SetWindowMaximum( ith_histogram->Quantile(0, UpperPercentileMatching) );
      rescaler->Update();
 
      rescaledGradientImageList[i] = rescaler->GetOutput();
      }
 
   typename OutputImageType::Pointer maxGI = MaxOfImageList<OutputImageType>(rescaledGradientImageList);
-
+/*
+  // Probably another rescaling was needed when we was computing added gradient image.
   typedef itk::IntensityWindowingImageFilter<OutputImageType,
                                              OutputImageType>           RescaleFilterType;
   typename RescaleFilterType::Pointer outputRescaler = RescaleFilterType::New();
@@ -168,13 +174,14 @@ GenerateMaxGradientImage(const std::vector<typename InputImageType::Pointer> & i
   outputRescaler->SetOutputMaximum(255);
   outputRescaler->SetInput( maxGI );
   outputRescaler->Update();
-
+*/
   MaxGradientImageTimer.Stop();
   itk::RealTimeClock::TimeStampType elapsedTime = MaxGradientImageTimer.GetTotal();
   std::cout << "Generating maximum gradient edgemap took " << elapsedTime
             << " " << MaxGradientImageTimer.GetUnit() << "." << std::endl;
 
-  return outputRescaler->GetOutput();
+  //return outputRescaler->GetOutput();
+  return maxGI;
 }
 
 #endif // __GenerateMaxGradientImage_h
