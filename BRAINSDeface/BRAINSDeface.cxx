@@ -95,9 +95,16 @@ int main(int argc, char **argv)
   DistanceMapFilter::Pointer distanceMapFilter = DistanceMapFilter::New();
   distanceMapFilter->SetInput(maskFilter->GetOutput());
   distanceMapFilter->InputIsBinaryOn();
+  distanceMapFilter->SetSquaredDistance(false);
 
   //Write the distance map to a file so we can see what it did:
   WriteImage(distanceMapFileName, distanceMapFilter->GetOutput());
+
+  //Try to scale distance map
+  typedef itk::MultiplyImageFilter<ImageType, ImageType, ImageType> ScalingFilterType;
+  ScalingFilterType::Pointer distanceMapScaler = ScalingFilterType::New();
+  distanceMapScaler->SetInput(distanceMapFilter->GetOutput());
+  distanceMapScaler->SetConstant(scaleDistanceMap);
 
   //Perform some kind of BSpline on Image
   const int BSplineOrder = 3;
@@ -124,7 +131,7 @@ int main(int argc, char **argv)
   CombinerType::Pointer combiner = CombinerType::New();
   combiner->SetBSplineInput(bSpline);
   combiner->SetInput(subject);
-  combiner->SetDistanceMap(distanceMapFilter->GetOutput());
+  combiner->SetDistanceMap(distanceMapScaler->GetOutput());
   combiner->Update();
 
   //write the new displacement image
