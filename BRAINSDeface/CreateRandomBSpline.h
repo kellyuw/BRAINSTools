@@ -122,12 +122,20 @@ protected:
     SIit.GoToBegin();
     for( ; !LRit.IsAtEnd(); ++LRit, ++PAit, ++SIit)
       {
+#if 0 //old method
       ImagePointType point;
       coefficientImgLR->TransformIndexToPhysicalPoint(LRit.GetIndex(), point);
+#endif
+      ImagePointType pointLR;
+      ImagePointType pointPA;
+      ImagePointType pointSI;
+      coefficientImgLR->TransformIndexToPhysicalPoint(LRit.GetIndex(), pointLR);
+      coefficientImgPA->TransformIndexToPhysicalPoint(PAit.GetIndex(), pointPA);
+      coefficientImgSI->TransformIndexToPhysicalPoint(SIit.GetIndex(), pointSI);
 
-      double x = point[0];
-      double y = point[1];
-      double z = point[2];
+      double x = pointLR[0];
+      double y = pointPA[1];
+      double z = pointSI[2];
 
 
       //if( y > 0 ) continue; //only front half of skull
@@ -147,12 +155,25 @@ protected:
     for( ; !LRit.IsAtEnd(); ++LRit, ++PAit, ++SIit)
       {
 
+      ImagePointType pointLR;
+      ImagePointType pointPA;
+      ImagePointType pointSI;
+      coefficientImgLR->TransformIndexToPhysicalPoint(LRit.GetIndex(), pointLR);
+      coefficientImgPA->TransformIndexToPhysicalPoint(PAit.GetIndex(), pointPA);
+      coefficientImgSI->TransformIndexToPhysicalPoint(SIit.GetIndex(), pointSI);
+
+      double x = pointLR[0];
+      double y = pointPA[1];
+      double z = pointSI[2];
+
+#if 0
       ImagePointType point;
       coefficientImgLR->TransformIndexToPhysicalPoint(LRit.GetIndex(), point);
 
       double x = point[0];
       double y = point[1];
       double z = point[2];
+#endif
       //if( y > 0 ) continue; //Only front half of skull
       if( x <= 0 )
         {
