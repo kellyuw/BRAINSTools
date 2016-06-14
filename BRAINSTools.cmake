@@ -203,7 +203,7 @@ set(brains_modulenames
   AutoWorkup
   BRAINSDWICleanup
   ReferenceAtlas
-  BRAINSDeface
+  BRAINSRefacer
   )
 
 if(USE_DebugImageViewer)
