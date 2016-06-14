@@ -1,5 +1,18 @@
 MakeTestDriverFromSEMTool(BRAINSDeface BRAINSDefaceTest.cxx)
-message(WARNING "TestData should be placed into directory /scratch/testData/BRAINSDefaceData")
+set(DefaceTestData_DIR "/scratch/testData/BRAINSDefaceData")
+message(WARNING "TestData should be placed into directory ${DefaceTestData_DIR}")
+
+
+## add all sipmle CLP programs to cmakelist
+## based off of BrainsConsteallationDetector/TestSuite/CMakeLists
+set(ALL_PROGS_LIST_BRAINSDEFACETEST
+        BRAINSDefaceBrainDataTest
+        )
+
+## Simple CLP programs without TestDriver wrappers
+foreach(prog ${ALL_PROGS_LIST_BRAINSDEFACETEST})
+    StandardBRAINSBuildMacro(NAME ${prog} TARGET_LIBRARIES BRAINSCommonLib )
+endforeach()
 
 ExternalData_add_test( ${PROJECT_NAME}FetchData NAME BRAINSDefaceTest_RunTest
   COMMAND ${LAUNCH_EXE} $<TARGET_FILE:BRAINSDefaceTestDriver>
@@ -25,3 +38,14 @@ ExternalData_add_test( ${PROJECT_NAME}FetchData NAME BRAINSDefaceTest_RunTest
   --finalTransformFileName
     ${DefaceTestData_DIR}/finalTransform.h5
   )
+
+
+## based off of BCD testsuite
+
+set(PARENT_TEST BRAINSDefaceTest_RunTest)
+set(DefaceTestName BRAINSDefaceBrainDataTest})
+ExternalData_add_test(${PROJECT_NAME}FetchData NAME ${DefaceTestName}
+        COMMAND ${LAUNCH_EXE} $<TARGET_FILE:BRAINSDefaceBrainDataTest>
+        )
+## TODO: not sure if this is correct
+set_property(TEST ${DefaceTestName} APPEND PROPERTY DEPENDS ${PARENT_TEST})
