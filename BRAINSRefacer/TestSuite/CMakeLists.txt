@@ -39,8 +39,11 @@ ExternalData_add_test( ${PROJECT_NAME}FetchData NAME BRAINSRefacerTest_RunTest
   )
 
 set(PARENT_TEST BRAINSRefacerTest_RunTest)
-set(RefacerTestName BRAINSRefacerBrainDataTest})
+set(RefacerTestName BRAINSRefacerBrainDataTest)
 ExternalData_add_test(${PROJECT_NAME}FetchData NAME ${RefacerTestName}
         COMMAND ${LAUNCH_EXE} $<TARGET_FILE:BRAINSRefacerBrainDataTest>
-        )
+        --inputOriginal ${RefacerTestData_DIR}/t1_average_BRAINSABC.nii.gz
+        --inputRefaced ${RefacerTestData_DIR}/defacedSubject.nii.gz
+        --brainLabelMap ${RefacerTestData_DIR}/JointFusion_HDAtlas20_2015_dustCleaned_label.nii.gz
+  )
 set_property(TEST ${RefacerTestName} APPEND PROPERTY DEPENDS ${PARENT_TEST})
