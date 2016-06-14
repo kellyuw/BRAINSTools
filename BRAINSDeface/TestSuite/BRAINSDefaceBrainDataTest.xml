@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Testing</category>
+  <title>Template for testing</title>
+  <description>
+    Template used for quickly creating new tests
+  </description>
+  <version>0.0.1</version>
+  <documentation-url> </documentation-url>
+  <license> </license>
+  <contributor>Jeffrey Obadal</contributor>
+  <acknowledgements>
+  </acknowledgements>
+
+  <parameters>
+    <label>Input</label>
+    <description>Input parameters</description>
+
+    <image>
+      <name>originalInput</name>
+      <longflag>--originalInput</longflag>
+      <label>Original Image</label>
+      <channel>input</channel>
+      <description>Original image before refacing.</description>
+    </image>
+
+  </parameters>
+
+</executable>
