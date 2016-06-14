@@ -4,7 +4,6 @@ message(WARNING "TestData should be placed into directory ${DefaceTestData_DIR}"
 
 
 ## add all sipmle CLP programs to cmakelist
-## based off of BrainsConsteallationDetector/TestSuite/CMakeLists
 set(ALL_PROGS_LIST_BRAINSDEFACETEST
         BRAINSDefaceBrainDataTest
         )
@@ -39,13 +38,9 @@ ExternalData_add_test( ${PROJECT_NAME}FetchData NAME BRAINSDefaceTest_RunTest
     ${DefaceTestData_DIR}/finalTransform.h5
   )
 
-
-## based off of BCD testsuite
-
 set(PARENT_TEST BRAINSDefaceTest_RunTest)
 set(DefaceTestName BRAINSDefaceBrainDataTest})
 ExternalData_add_test(${PROJECT_NAME}FetchData NAME ${DefaceTestName}
         COMMAND ${LAUNCH_EXE} $<TARGET_FILE:BRAINSDefaceBrainDataTest>
         )
-## TODO: not sure if this is correct
 set_property(TEST ${DefaceTestName} APPEND PROPERTY DEPENDS ${PARENT_TEST})

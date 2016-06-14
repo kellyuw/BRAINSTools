@@ -14,6 +14,7 @@ FindITKUtil(BRAINSDeface_ITK
   ITKDistanceMap
   ITKThresholding
   ITKTestKernel
+  ITKImageCompare
 )
 
 #-----------------------------------------------------------------------------
