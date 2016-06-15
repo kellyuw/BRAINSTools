@@ -1,6 +1,7 @@
 #!/bin/bash
 # Script to run the Test Suite for BRAINSRefacer nightly
 # Change the paths of the directories below
+# This needs to be copied to and run from a location outside of the source directory.
 
 BASE_DIR=~/code/brains/alexProject
 SOURCE_DIR=${BASE_DIR}/BRAINSTools
