@@ -3,11 +3,10 @@
 # Change the paths of the directories below
 # This needs to be copied to and run from a location outside of the source directory.
 
-BASE_DIR=~/code/brains/alexProject
+BASE_DIR=~/code/brains/
 SOURCE_DIR=${BASE_DIR}/BRAINSTools
-BUILD_DIR=${BASE_DIR}/nightlyBuild
-EXTERNAL_SOURCES_DIR=~/code/brains/nightly/build
-
+BUILD_DIR=${BASE_DIR}/BRAINSTools-Refacer-Nightly-Release
+EXTERNAL_SOURCES_DIR=${BASE_DIR}/BRAINSTools-SuperBuild-RelWithDebugInfo
 
 if [[ ! -d ${BASE_DIR} ]]; then
   echo "base directory doesn't exist";
@@ -37,15 +36,16 @@ fi
 cd ${BUILD_DIR};
 
 echo "Configuring with cmake"
-/usr/local/bin/cmake ${SOURCE_DIR} -DBRAINSTools_SUPERBUILD:BOOL=OFF -DSlicerExecutionModel_DIR:PATH=${EXTERNAL_SOURCES_DIR}/SlicerExecutionModel-build -DCMAKE_MODULE_PATH:PATH=${SOURCE_DIR}/CMake -DUSE_BRAINSRefacer=ON -DUSE_ANTS=OFF -DUSE_AutoWorkup=OFF -DUSE_BRAINSABC=OFF -DUSE_BRAINSConstellationDetector=OFF -DUSE_BRAINSDWICleanup=OFF -DUSE_BRAINSFit=OFF -DUSE_BRAINSInitializedControlPoints=OFF -DUSE_BRAINSLabelStats=OFF -DUSE_BRAINSLandmarkInitializer=OFF -DUSE_BRAINSROIAuto=OFF -DUSE_BRAINSResample=OFF -DUSE_BRAINSSnapShotWriter=OFF -DUSE_BRAINSStripRotation=OFF -DUSE_BRAINSTransformConvert=OFF -DUSE_DWIConvert=OFF -DUSE_ConvertBetweenFileFormats=OFF -DUSE_ImageCalculator=OFF -DUSE_ReferenceAtlas=OFF
+cmake ${SOURCE_DIR} -DBRAINSTools_SUPERBUILD:BOOL=OFF -DSlicerExecutionModel_DIR:PATH=${EXTERNAL_SOURCES_DIR}/SlicerExecutionModel-build -DITK_DIR:PATH=${EXTERNAL_SOURCES_DIR}/ITKv4-build/ -DCMAKE_CXX_STANDARD=11 -DUSE_BRAINSRefacer=ON -DUSE_ANTS=OFF -DUSE_AutoWorkup=OFF -DUSE_BRAINSABC=OFF -DUSE_BRAINSConstellationDetector=OFF -DUSE_BRAINSDWICleanup=OFF -DUSE_BRAINSFit=OFF -DUSE_BRAINSInitializedControlPoints=OFF -DUSE_BRAINSLabelStats=OFF -DUSE_BRAINSLandmarkInitializer=OFF -DUSE_BRAINSROIAuto=OFF -DUSE_BRAINSResample=OFF -DUSE_BRAINSSnapShotWriter=OFF -DUSE_BRAINSStripRotation=OFF -DUSE_BRAINSTransformConvert=OFF -DUSE_DWIConvert=OFF -DUSE_ConvertBetweenFileFormats=OFF -DUSE_ImageCalculator=OFF -DUSE_ReferenceAtlas=OFF
 
 echo "Building";
-make -j24 -k;
-make -j24 -k;
+make -j32 -k;
+make -j32 -k;
+make -j32 -k;
 
 echo "Testing"
-/usr/local/bin/ctest -j12 -D NightlyStart;
-/usr/local/bin/ctest -j12 -D NightlyConfigure;
-/usr/local/bin/ctest -j12 -D NightlyBuild;
-/usr/local/bin/ctest -j12 -D NightlyTest;
-/usr/local/bin/ctest -j12 -D NightlySubmit;
+ctest -j16 -D NightlyStart;
+ctest -j16 -D NightlyConfigure;
+ctest -j16 -D NightlyBuild;
+ctest -j16 -D NightlyTest;
+ctest -j16 -D NightlySubmit;

@@ -1,5 +1,5 @@
 MakeTestDriverFromSEMTool(BRAINSRefacer BRAINSRefacerTest.cxx)
-set(RefacerTestData_DIR "/scratch/testData/BRAINSRefacerData")
+set(RefacerTestData_DIR "$ENV{HOME}/testData/BRAINSRefacerData")
 message(WARNING "TestData should be placed into directory ${RefacerTestData_DIR}")
 
 
