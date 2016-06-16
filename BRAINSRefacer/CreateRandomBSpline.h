@@ -6,6 +6,7 @@
 
 #include <itkBSplineTransform.h>
 #include <itkImageRegionIteratorWithIndex.h>
+#include <ctime>
 
 template<typename TInputImage,
   typename TPixelType,
@@ -108,7 +109,7 @@ protected:
     //Setup a paramaters variable for the bspline
     typename BSplineType::ParametersType bSplineParams( numberOfParameters );
 
-    std::srand(time(nullptr));
+    std::srand(std::time(nullptr));
 
 #if 1
     ImagePointer coefficientImgLR = this->GetBSplineOutput()->GetCoefficientImages()[0];
