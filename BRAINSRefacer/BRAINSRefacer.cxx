@@ -24,6 +24,7 @@
 
 #include "CreateRandomBSpline.h"
 #include "CombineBSplineWithDisplacement.h"
+#include "MaskFromLandmarks.h"
 
 //Convienience function to write images
 template< typename TImageType >
@@ -85,137 +86,33 @@ int main(int argc, char **argv)
   imageReader->Update();
 
   //Read in the atlas label file
-  typedef itk::Image<PixelType, Dimension> LabelAtlasType;
-  typedef itk::ImageFileReader<LabelAtlasType> LabelAtlasReaderType;
-  LabelAtlasReaderType::Pointer labelAtlasReader = LabelAtlasReaderType::New();
-  labelAtlasReader->SetFileName(labelmap);
+  //typedef itk::Image<PixelType, Dimension> LabelAtlasType;
+  //typedef itk::ImageFileReader<LabelAtlasType> LabelAtlasReaderType;
+  //LabelAtlasReaderType::Pointer labelAtlasReader = LabelAtlasReaderType::New();
+  //labelAtlasReader->SetFileName(labelmap);
 
   typedef itk::Image<unsigned char, Dimension> MaskAtlasType;
 
   //Read in the landmarks file
   LandmarksMapType myLandmarks = ReadSlicer3toITKLmk(landmarks);
-  //print out landmarks
-  typedef LandmarksMapType::const_iterator LandmarksIteratorType;
-  LandmarksIteratorType lmIter;
-/*
 
+  typedef MaskFromLandmarks<ImageType> MaskFromLandmarks;
+  MaskFromLandmarks::Pointer masker = MaskFromLandmarks::New();
 
-  for(lmIter = myLandmarks.begin(); lmIter != myLandmarks.end(); ++lmIter )
-    {
-    std::cout <<"Landmark: " << lmIter->first << "\t\t";
-    std::cout << "Point: " << lmIter->second << std::endl;
-    }
-  */
+  masker->printHello();
 
-  // Get the points for the right eye, the left eye and the dens_axis
-  typedef itk::Point<double, 3> PointType;
-#if 1
-  PointType rightEye   = myLandmarks.find("RE")->second;
-  PointType leftEye    = myLandmarks.find("LE")->second;
-  PointType dens_axis  = myLandmarks.find("dens_axis")->second;
-#endif
+  masker->SetInput(subject);
+  masker->SetLandmarksFileName(landmarks);
 
-#if 0
-  PointType rightEye;
-  rightEye[0] = 2;
-  rightEye[1] = 1;
-  rightEye[2] = -1;
+  //WriteSmartImage<MaskAtlasType>("/scratch/aleinoff/temp/maskTest1.nii.gz", masker->GetOutput());
 
-  PointType leftEye;
-  leftEye[0] = 0;
-  leftEye[1] = -2;
-  leftEye[2] = 0;
-
-  PointType dens_axis;
-  dens_axis[0] = 1;
-  dens_axis[1] = -1;
-  dens_axis[2] = 2;
-#endif
-
-  std::cout << "rightEye:\t" << rightEye << std::endl;
-  std::cout << "leftEye:\t" << leftEye << std::endl;
-  std::cout << "dens_axis:\t" << dens_axis << std::endl;
-
-
-  // find the a,b,c for the plane equation ax + by + c = 0
-  // first get two vectors in the plane u and v
-  typedef itk::Vector<double,3> VectorType;
-  VectorType u = rightEye - leftEye;
-  VectorType v = dens_axis - leftEye;
-
-  std::cout << "vector u: \t" << u << std::endl;
-  std::cout << "vector v: \t" << v << std::endl;
-
-  VectorType cross = itk::CrossProduct(u, v);
-  std::cout << "vector cross: \t" << cross <<std::endl;
-
-  //for ax + by + cz = d plug in cross for abc and one of the points (dens_axis) for xyz
-  VectorType leftEyeVector;
-  leftEyeVector[0] = leftEye[0];
-  leftEyeVector[1] = leftEye[1];
-  leftEyeVector[2] = leftEye[2];
-
-  VectorType::ComponentType d = cross * leftEyeVector;
-  std::cout << "d:\t" << d << std::endl;
-
-  std::cout << "equation of plane is:" << std::endl;
-  std::cout << cross[0] << "x + " << cross[1] << "y + " << cross[2] << "z = " << d << std::endl;
-
-  // make a mask based on the plane:
-
-  // first create mask image
-  MaskAtlasType::Pointer maskImageLM = MaskAtlasType::New();
-  maskImageLM->SetOrigin(subject->GetOrigin());
-  maskImageLM->SetSpacing(subject->GetSpacing());
-  maskImageLM->SetDirection(subject->GetDirection());
-  maskImageLM->SetRegions(subject->GetLargestPossibleRegion());
-  maskImageLM->Allocate();
-
-  typedef itk::ImageRegionConstIterator<ImageType> SubjectIteratorType;
-  SubjectIteratorType subjectIt(subject, subject->GetLargestPossibleRegion());
-
-  typedef itk::ImageRegionIterator<MaskAtlasType> MaskIteratorType;
-  MaskIteratorType maskIt(maskImageLM, maskImageLM->GetLargestPossibleRegion());
-
-  subjectIt.GoToBegin();
-  maskIt.GoToBegin();
-
-  // go through image to see if pixel is in mask or not??
-
-  while(!subjectIt.IsAtEnd())
-    {
-    PointType currentPoint;
-    subject->TransformIndexToPhysicalPoint(subjectIt.GetIndex(), currentPoint);
-  //  std::cout << currentPoint <<std::endl;
-
-    VectorType currentVector;
-    currentVector[0] = currentPoint[0];
-    currentVector[1] = currentPoint[1];
-    currentVector[2] = currentPoint[2];
-
-    if( d > cross * currentVector )
-      {
-      maskIt.Set(0);
-      }
-    else
-      {
-      maskIt.Set(1);
-      }
-
-    ++maskIt;
-    ++subjectIt;
-    }
-
-
-
-  WriteSmartImage<MaskAtlasType>("/scratch/aleinoff/temp/maskTest.nii.gz", maskImageLM);
-
-  return 0;
 
 
   //Turn Label map into binary image. Use a threshold Image filter?? or brainscut?
   //Write a new filter for this??
   //typedef itk::Image<unsigned char, Dimension> MaskAtlasType;
+
+  /*use landmark mask
   typedef itk::BinaryThresholdImageFilter< LabelAtlasType, MaskAtlasType>  MaskFilterType;
   MaskFilterType::Pointer maskFilter = MaskFilterType::New();
 
@@ -224,13 +121,17 @@ int main(int argc, char **argv)
   maskFilter->SetInsideValue(0);
   maskFilter->SetLowerThreshold(0);
   maskFilter->SetUpperThreshold(0);
+   */
+
 
   //Write to a file
-  WriteImage(outputMask, maskFilter->GetOutput());
+  MaskAtlasType::Pointer maskAtlas = masker->GetOutput();
+  masker->Update();
+  WriteImage<MaskAtlasType>(outputMask, maskAtlas);
   //Get a distance map to the Brain region:
   typedef itk::DanielssonDistanceMapImageFilter<MaskAtlasType, ImageType, ImageType> DistanceMapFilter;
   DistanceMapFilter::Pointer distanceMapFilter = DistanceMapFilter::New();
-  distanceMapFilter->SetInput(maskFilter->GetOutput());
+  distanceMapFilter->SetInput(maskAtlas);
   distanceMapFilter->InputIsBinaryOn();
   distanceMapFilter->SetSquaredDistance(false);
 
